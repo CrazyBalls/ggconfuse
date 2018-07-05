@@ -8,14 +8,14 @@ sys.setdefaultencoding('utf8')
 import os
 import random
 
-TheProjectPath = '/Users/guoxiaolei/Desktop/DEMO/XYTableViewNoDataView-master/XYTableViewNoDataViewDemo/'  #项目路径 直接脱进来
-ThePrefix_New = 'UU'   #类名新前缀
-ThePrefix_Old = 'CYW'   #类名旧前缀
+TheProjectPath = ''  #项目路径 直接脱进来
+ThePrefix_New = 'NEW'   #类名新前缀
+ThePrefix_Old = 'OLD'   #类名旧前缀
 TheJunkCode_type = '' #
 TheJunkCode_count = 5  #生成垃圾代码方法数量
 TheJunkCode_methodslength =  16 #生成垃圾代码方法长度
 TheJunkCode_outlength =  10    #生成垃圾代码方法输出长度
-TheJunkCode_Dir  = ['Assets.xcassets','Base.lproj','MJRefresh','xcodeproj','XYTableViewNoDataView']  #过滤输入目录名即可
+TheJunkCode_Dir  = ['Assets.xcassets','Base.lproj','xcodeproj','第三方','Pods','icons']  #过滤输入目录名即可
 
 TheJunkCode_Filesuffix = ['.DS_Store','main.m','json','Info.plist']  #过滤文件名
 
@@ -123,13 +123,13 @@ def getClassNameArr(Path):
 def addJunkCode():
     for tmpFile in alljunkfile:
         junkcodeStr = generate_random_str(tmpFile)
-        file = open(tmpFile,"r+")
-        fileContent = file.readlines()
-        for line in fileContent:
-            line_new = line.replace('@end', junkcodeStr + '\n@end')
-            print  line_new
-            file.write(line_new)
-        file.close()
+        # file = open(tmpFile,"r+")
+        # fileContent = file.readlines()
+        # for line in fileContent:
+        #     line_new = line.replace('@end', junkcodeStr + '\n@end')
+        #     print  line_new
+        #     file.write(line_new)
+        # file.close()
 
 def productCode(Path):
     allfilelist = os.listdir(Path)
@@ -166,35 +166,40 @@ def generate_random_str(filetype):
     random_str = '-(void)'
     base_str = 'abcdefghigklmnopqrstuvwxyz0123456789'
     base_str2 = 'abcdefghigklmnopqrstuvwxyz'
-    for i in range(2):
-        random_str += base_str2[random.randint(0, len(base_str2) - 1)]
-    for i in range(TheJunkCode_methodslength-6):
-        random_str += base_str[random.randint(0, len(base_str) - 1)]
-    random_str += '_'
-    for i in range(4):
-        random_str += base_str2[random.randint(0, len(base_str2) - 1)]
-    #.h.m 分开混淆
-    if ('.h' in filetype):
-        random_str += ';'
-        return random_str
-    else:
-        random_str += '{\n  NSLog(@"'
-        for i in range(TheJunkCode_outlength):
-            random_str += base_str[random.randint(0, len(base_str))]
-        random_str+= '");\n  [self superclass];\n}'
-        return random_str
+    try:
+        if ('.h'  in filetype or '.m'  in filetype):
+            for i in range(2):
+                random_str += base_str2[random.randint(0, len(base_str2) - 1)]
+            for i in range(TheJunkCode_methodslength - 6):
+                random_str += base_str[random.randint(0, len(base_str) - 1)]
+            random_str += '_'
+            for i in range(4):
+                random_str += base_str2[random.randint(0, len(base_str2) - 1)]
+            # .h.m 分开混淆
+            if ('.h' in filetype):
+                random_str += ';'
+                return random_str
+            elif ('.m' in filetype):
+                random_str += '{\n  NSLog(@"'
+                for i in range(TheJunkCode_outlength):
+                    random_str += base_str[random.randint(0, len(base_str))]
+                random_str += '");\n  [self superclass];\n}'
+                return random_str
+
+    except Exception, e:
+        print ("JunkCode: %s-------%s" % (e,filetype))
 
 #启动开始
 try:
     print ('获取代码文件')
     productCode(TheProjectPath)
     print ('开始添加混淆代码')
-   # addJunkCode()
+    addJunkCode()
     print ('混淆代码添加完毕')
     print ('获取所有M类名')
-    getClassNameArr(TheProjectPath)
+    #getClassNameArr(TheProjectPath)
     print ('开始修改类名前缀')
-    modifyClassName()
+    #modifyClassName()
     print ('类名前缀修改完毕')
 except Exception, e:
     print ("Error: %s"%(e))
