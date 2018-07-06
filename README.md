@@ -32,4 +32,6 @@
  
 ##根据需求 然后运行即可 Python2 环境
 ----------
+```python gxlconfusion.py
+```
 
