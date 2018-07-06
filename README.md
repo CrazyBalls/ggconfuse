@@ -2,12 +2,13 @@
 重要：记得备份X1 记得备份X2 记得备份X3
 1.5版本更新内容：BUG修复增加垃圾代码
 一介绍
- 1用来混淆IOS 目前第一版雏形上线
- 2以后慢慢优化增加垃圾变量 以及混淆变量 还有修改图片hash值
+1用来混淆IOS 目前第一版雏形上线
+2以后慢慢优化增加垃圾变量 以及混淆变量 还有修改图片hash值
 
- 二功能
- 1增加.h.m添加垃圾代码方法 自定义数量 方法长度等
- 2修改项目前缀
+二功能
+1增加.h.m添加垃圾代码方法 自定义数量 方法长度等
+2修改项目前缀
+3新增垃圾代码文件
 三使用方法
 
 TheProjectPath = ''  #项目路径 直接脱进来
@@ -20,5 +21,10 @@ TheJunkCode_outlength =  10    #生成垃圾代码方法输出长度
 TheJunkCode_Dir  = ['Assets.xcassets','Base.lproj','MJRefresh','xcodeproj','XYTableViewNoDataView']  #过滤输入目录名即可
 
 TheJunkCode_Filesuffix = ['.DS_Store','main.m','json','Info.plist']  #过滤文件名
+
+TheJunkFilePath = ''  #垃圾文件目录
+PCH_Path = '' #PCH路径
+TheJunkFilePathCount = 5  #文件数量（.h.m为1个）
+
 
 根据需求 然后运行即可 
