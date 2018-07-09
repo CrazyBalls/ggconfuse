@@ -7,6 +7,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 import os
 import random
+import string
+
 
 TheProjectPath = '/Users/guoxiaolei/Desktop/wealth/LDAccount-master/LZAccount/'  #项目路径 直接脱进来
 ThePrefix_New = 'SFSM'   #类名新前缀
@@ -23,6 +25,8 @@ TheJunkFilePath = '/Users/guoxiaolei/Desktop/wealth/LED-master/LED/LED/Model/'  
 PCH_Path = '/Users/guoxiaolei/Desktop/wealth/LED-master/LED/LED/PrefixHeader.pch' #PCH路径
 TheJunkFilePathCount = 5  #文件数量（.h.m为1个）
 
+TheMD5FilePath = '/Users/guoxiaolei/Desktop/wealth/LED-master/截图'
+
 
 alljunkfile = []  #垃圾代码文件目录
 
@@ -31,7 +35,9 @@ classMFiles = [] #全局.m文件拿到
 classHMFiles = []  #全局.hm文件拿到
 
 junkClassFiles = [] #全局垃圾文件记录放到PCH导入
-#类名前缀修改
+
+
+# ----------------------------------------类名前缀修改--------------------
 def modifyClassName():
     for tmpMFile in classMFiles:
         [dirmname, oldmfilename] = os.path.split(tmpMFile)
@@ -81,27 +87,6 @@ def modifyClassName():
                 file.close()
                 with open(tmpHMFile, 'w+') as f:
                     f.writelines(data)
-
-
-    # for tmpFile in allfile:
-    #     [dirname, oldfilename] = os.path.split(tmpFile)
-    #     #获取文件名称
-    #     print(dirname, "\n", oldfilename)
-    #     #开始修改 判断1前缀是否符合 2修改文件名前缀 3修改内容前缀
-    #     if (oldfilename[0:len(ThePrefix_Old)] == ThePrefix_Old):
-    #         filenameNew = oldfilename.replace(ThePrefix_Old,ThePrefix_New)
-    #         #2）
-    #         os.rename(tmpFile,dirname+'/'+filenameNew)
-    #         #3）
-    #         file = open(tmpFile, "r+")
-    #         fileContent = file.readlines()
-    #         oldclassName =  oldfilename[:-2] #去掉后缀.h.m
-    #         newclassName = filenameNew[:-2]  # 去掉后缀.h.m
-    #         for line in fileContent:
-    #             line_new = line.replace(oldclassName, newclassName)
-    #             file.write(line_new)
-    #         file.close()
-
 # 获取所有.m文件进行
 def getClassNameArr(Path):
     allfilelist = os.listdir(Path)
@@ -123,7 +108,8 @@ def getClassNameArr(Path):
                 classHMFiles.append(filepath)
             if ('.xib' in tmpFile):
                 classHMFiles.append(filepath)
-#生成垃圾代码
+
+# ----------------------------------------生成垃圾代码--------------------
 def addJunkCode():
     for tmpFile in alljunkfile:
         junkcodeStr = generate_random_str(tmpFile)
@@ -193,7 +179,7 @@ def generate_random_str(filetype):
     except Exception, e:
         print ("JunkCode: %s-------%s" % (e,filetype))
 
-#生成文件
+# ----------------------------------------生成文件----------------------
 def product_junkFile():
     base_str2 = 'abcdefghigklmnopqrstuvwxyz'
     try:
@@ -241,6 +227,32 @@ def insertjunkFiletoPch():
         file.write(line_new)
     file.close()
 
+
+#----------------------------------------改变文件md5----------------------
+def changeSingleFileMD5(file_path):
+    _, file_type = os.path.splitext(file_path)
+    with open(file_path, "ab") as fileObj:
+        if file_type == ".png":
+            text = "".join(random.sample(string.ascii_letters, 11))
+        elif file_type == ".jpg":
+            text = "".join(random.sample(string.ascii_letters, 20))
+        elif file_type == ".lua":
+            text = "\n--#*" + "".join(random.sample(string.ascii_letters, 10)) + "*#--"
+        else:
+            text = " "*random.randint(1, 100)
+        fileObj.write(text)
+        fileObj.close()
+#改变文件md5
+def changeFolderMD5(target_path):
+    type_filter = set([".png", ".jpg", ".lua", ".json", ".plist", ".fnt"])
+    for parent, folders, files in os.walk(target_path):
+        for file in files:
+            full_path = os.path.join(parent, file)
+            _, file_type = os.path.splitext(full_path)
+            if file_type in type_filter:
+                changeSingleFileMD5(full_path)
+
+
 #启动开始
 try:
     # print ('获取代码文件')
@@ -253,8 +265,13 @@ try:
     # print ('开始修改类名前缀')
     # #modifyClassName()
     # print ('类名前缀修改完毕')
-    product_junkFile() #生成垃圾文件
-    insertjunkFiletoPch() #pch写入
+    print ('生成垃圾代码文件')
+    #product_junkFile() #生成垃圾文件
+    #insertjunkFiletoPch() #pch写入
+    print ('垃圾文件添加完毕')
+    print ('修改文件MD5')
+    changeFolderMD5(TheMD5FilePath)
+    print ('修改完毕')
 except Exception, e:
     print ("Error: %s"%(e))
 
