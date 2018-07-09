@@ -10,9 +10,9 @@ import random
 import string
 
 
-TheProjectPath = '/Users/guoxiaolei/Desktop/wealth/LDAccount-master/LZAccount/'  #项目路径 直接脱进来
-ThePrefix_New = 'SFSM'   #类名新前缀
-ThePrefix_Old = 'MM'   #类名旧前缀
+TheProjectPath = ''  #项目路径 直接脱进来
+ThePrefix_New = ''   #类名新前缀
+ThePrefix_Old = ''   #类名旧前缀
 TheJunkCode_type = '' #
 TheJunkCode_count = 5  #生成垃圾代码方法数量
 TheJunkCode_methodslength =  16 #生成垃圾代码方法长度
@@ -21,11 +21,11 @@ TheJunkCode_Dir  = ['Assets.xcassets','Base.lproj','xcodeproj','第三方','Pods
 
 TheJunkCode_Filesuffix = ['.DS_Store','main.m','json','Info.plist']  #过滤文件名
 
-TheJunkFilePath = '/Users/guoxiaolei/Desktop/wealth/LED-master/LED/LED/Model/'  #垃圾文件目录
-PCH_Path = '/Users/guoxiaolei/Desktop/wealth/LED-master/LED/LED/PrefixHeader.pch' #PCH路径
+TheJunkFilePath = ''  #垃圾文件目录
+PCH_Path = '' #PCH路径
 TheJunkFilePathCount = 5  #文件数量（.h.m为1个）
 
-TheMD5FilePath = '/Users/guoxiaolei/Desktop/wealth/LED-master/截图'
+TheMD5FilePath = ''
 
 
 alljunkfile = []  #垃圾代码文件目录
@@ -113,13 +113,14 @@ def getClassNameArr(Path):
 def addJunkCode():
     for tmpFile in alljunkfile:
         junkcodeStr = generate_random_str(tmpFile)
-        file = open(tmpFile,"r+")
-        fileContent = file.readlines()
-        for line in fileContent:
-            line_new = line.replace('@end', junkcodeStr + '\n@end')
-            print  line_new
-            file.write(line_new)
-        file.close()
+        file_data = ""
+        with open(tmpFile, "r") as f:
+            for line in f:
+                if '@end' in line:
+                    line = line.replace('@end', junkcodeStr + '\n@end')
+                file_data += line
+        with open(tmpFile, "w") as f:
+            f.write(file_data)
 
 def productCode(Path):
     allfilelist = os.listdir(Path)
@@ -171,8 +172,9 @@ def generate_random_str(filetype):
                 return random_str
             elif ('.m' in filetype):
                 random_str += '{\n  NSLog(@"'
-                for i in range(TheJunkCode_outlength):
-                    random_str += base_str[random.randint(0, len(base_str))]
+                for i in range(10):
+                    random_str += base_str[random.randint(0, len(base_str)-1)]
+                print 'm方法'+ random_str
                 random_str += '");\n  [self superclass];\n}'
                 return random_str
 
@@ -220,13 +222,14 @@ def insertjunkFiletoPch():
     importStr = ''
     for tmpFile in junkClassFiles:
         importStr+=tmpFile+'\n'
-    file = open(PCH_Path, "r+")
-    fileContent = file.readlines()
-    for line in fileContent:
-        line_new = line.replace('#endif ', importStr + '\n#endif ')
-        file.write(line_new)
-    file.close()
-
+    file_data = ''
+    with open(PCH_Path, "r") as f:
+        for line in f:
+            if '#endif' in line:
+                line = line.replace('#endif', importStr + '\n#endif ')
+            file_data += line
+    with open(PCH_Path, "w") as f:
+        f.write(file_data)
 
 #----------------------------------------改变文件md5----------------------
 def changeSingleFileMD5(file_path):
@@ -255,11 +258,11 @@ def changeFolderMD5(target_path):
 
 #启动开始
 try:
-    # print ('获取代码文件')
-    # productCode(TheProjectPath)
-    # print ('开始添加混淆代码')
-    # addJunkCode()
-    # print ('混淆代码添加完毕')
+    print ('获取代码文件')
+    productCode(TheProjectPath)
+    print ('开始添加混淆代码')
+    addJunkCode()
+    print ('混淆代码添加完毕')
     # print ('获取所有M类名')
     # #getClassNameArr(TheProjectPath)
     # print ('开始修改类名前缀')
@@ -270,7 +273,7 @@ try:
     #insertjunkFiletoPch() #pch写入
     print ('垃圾文件添加完毕')
     print ('修改文件MD5')
-    changeFolderMD5(TheMD5FilePath)
+    #changeFolderMD5(TheMD5FilePath)
     print ('修改完毕')
 except Exception, e:
     print ("Error: %s"%(e))
