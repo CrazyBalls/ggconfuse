@@ -10,9 +10,9 @@ import random
 import string
 
 
-TheProjectPath = ''  #项目路径 直接脱进来
-ThePrefix_New = ''   #类名新前缀
-ThePrefix_Old = ''   #类名旧前缀
+TheProjectPath = '/Users/guoxiaolei/Desktop/wealth/AZXTallyBook-master/666666'  #项目路径 直接脱进来
+ThePrefix_New = 'DYC'   #类名新前缀
+ThePrefix_Old = 'AZX'   #类名旧前缀
 TheJunkCode_type = '' #
 TheJunkCode_count = 5  #生成垃圾代码方法数量
 TheJunkCode_methodslength =  16 #生成垃圾代码方法长度
@@ -111,15 +111,17 @@ def getClassNameArr(Path):
 
 # ----------------------------------------生成垃圾代码--------------------
 def addJunkCode():
+    print  alljunkfile
     for tmpFile in alljunkfile:
         junkcodeStr = generate_random_str(tmpFile)
         file_data = ""
         with open(tmpFile, "r") as f:
-            for line in f:
-                if '@end' in line:
-                    line = line.replace('@end', junkcodeStr + '\n@end')
-                file_data += line
+            lines = f.readlines()  # 读取所有行
+            last_line = lines[-1]  # 取最后一行
+            file_data = last_line.replace('@end', junkcodeStr + '\n@end')
+        print file_data
         with open(tmpFile, "w") as f:
+            f.writelines([item for item in lines[:-1]])
             f.write(file_data)
 
 def productCode(Path):
@@ -174,7 +176,6 @@ def generate_random_str(filetype):
                 random_str += '{\n  NSLog(@"'
                 for i in range(10):
                     random_str += base_str[random.randint(0, len(base_str)-1)]
-                print 'm方法'+ random_str
                 random_str += '");\n  [self superclass];\n}'
                 return random_str
 
@@ -264,9 +265,9 @@ try:
     addJunkCode()
     print ('混淆代码添加完毕')
     # print ('获取所有M类名')
-    # #getClassNameArr(TheProjectPath)
+    #getClassNameArr(TheProjectPath)
     # print ('开始修改类名前缀')
-    # #modifyClassName()
+    #modifyClassName()
     # print ('类名前缀修改完毕')
     print ('生成垃圾代码文件')
     #product_junkFile() #生成垃圾文件
